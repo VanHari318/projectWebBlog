@@ -1,6 +1,7 @@
 "use client";
 import useSWR from "swr";
 import PostForm from "./PostForm";
+import Link from "next/link";
 
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
@@ -19,10 +20,13 @@ export default function BlogClient({ initialData }: { initialData: any }) {
 
       <div className="grid gap-4 mt-6">
         {posts?.map((post: any) => (
-          <div key={post._id} className="p-4 border rounded shadow bg-white text-black">
-            <h2 className="text-xl font-semibold">{post.title}</h2>
-            <p className="text-gray-600">{post.content}</p>
-          </div>
+            // Nếu có slug thì dùng slug, không thì dùng tạm _id
+            <Link key={post._id} href={`/post/${post.slug || post._id}`}>
+                <div className="p-4 border rounded hover:shadow-lg cursor-pointer transition-all">
+                <h2 className="text-xl font-bold text-blue-600">{post.title}</h2>
+                <p className="line-clamp-3">{post.content}</p>
+                </div>
+            </Link>
         ))}
       </div>
     </main>
