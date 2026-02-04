@@ -2,50 +2,59 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import Link from "next/link";
 
-export default async function PostDetail({ params }: { params: { id: string } }) {
-  const client = await clientPromise;
-  const db = client.db("myBlog");
-  
-  // Tạo bộ lọc tìm kiếm
-  const query = params.id.length === 24 
-    ? { _id: new ObjectId(params.id) } // Nếu là ID thì tìm theo _id
-    : { slug: params.id };            // Nếu không phải thì tìm theo slug
+// Đổi params.id thành params.slug ở đây
+export default async function PostDetail({ params }: { params: { slug: string } }) {
+  try {
+    const client = await clientPromise;
+    const db = client.db("myBlog");
+    
+    // Đổi params.id thành params.slug
+    const identifier = params.slug;
 
-  const post = await db.collection("posts").findOne(query as any);
+    let query: any = { slug: identifier };
 
-  if (!post) return <div className="text-center mt-20">Không tìm thấy bài viết!</div>;
+    // Kiểm tra định dạng ID MongoDB (24 ký tự hex)
+    const isValidObjectId = /^[0-9a-fA-F]{24}$/.test(identifier);
+    
+    if (isValidObjectId) {
+      query = { 
+        $or: [
+          { _id: new ObjectId(identifier) },
+          { slug: identifier }
+        ] 
+      };
+    }
 
-  return (
-    <div className="min-h-screen bg-gray-100 py-10 px-4">
-      <div className="max-w-3xl mx-auto">
-        <Link href="/" className="text-blue-600 hover:underline mb-4 inline-block">
-          ← Quay lại trang chủ
-        </Link>
-        
-        <article className="bg-white rounded-xl shadow-lg overflow-hidden">
-          {/* Header bài viết */}
-          <div className="p-8 border-b border-gray-100">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-2">
+    const post = await db.collection("posts").findOne(query);
+
+    if (!post) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 text-black">
+          <p className="text-xl font-semibold text-gray-600 mb-4">Bài viết này không tồn tại!</p>
+          <Link href="/" className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition">
+            Quay về trang chủ
+          </Link>
+        </div>
+      );
+    }
+
+    return (
+      <div className="min-h-screen bg-gray-100 py-10 px-4">
+        <div className="max-w-3xl mx-auto">
+          <Link href="/" className="text-blue-600 hover:underline mb-6 inline-block">← Quay lại</Link>
+          <article className="bg-white rounded-2xl shadow-lg p-8">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
               {post.title}
             </h1>
-            <p className="text-sm text-gray-400">
-              Đăng vào: {new Date(post.createdAt || Date.now()).toLocaleDateString('vi-VN')}
-            </p>
-          </div>
-
-          {/* Nội dung bài viết */}
-          <div className="p-8 text-lg leading-relaxed text-gray-700 whitespace-pre-wrap">
-            {post.content}
-          </div>
-          
-          {/* Footer giả lập Reddit */}
-          <div className="bg-gray-50 p-4 px-8 flex gap-4 text-gray-500 text-sm font-bold">
-            <span>💬 0 Bình luận</span>
-            <span>🎁 Tặng thưởng</span>
-            <span>↪ Chia sẻ</span>
-          </div>
-        </article>
+            <div className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed">
+              {post.content}
+            </div>
+          </article>
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Lỗi bài viết:", error);
+    return <div className="p-10 text-center text-black">Đã có lỗi xảy ra. Vui lòng thử lại sau!</div>;
+  }
 }
