@@ -1,6 +1,7 @@
 import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 import Link from "next/link";
+import CommentSection from "@/components/CommentSection";
 
 // Đổi params.id thành params.slug ở đây
 export default async function PostDetail({ params }: { params: { slug: string } }) {
@@ -41,14 +42,14 @@ export default async function PostDetail({ params }: { params: { slug: string } 
     return (
       <div className="min-h-screen bg-gray-100 py-10 px-4">
         <div className="max-w-3xl mx-auto">
-          <Link href="/" className="text-blue-600 hover:underline mb-6 inline-block">← Quay lại</Link>
+          <Link href="/" className="text-blue-600 mb-6 inline-block">← Quay lại</Link>
+          
           <article className="bg-white rounded-2xl shadow-lg p-8">
-            <h1 className="text-4xl font-extrabold text-gray-900 mb-6 leading-tight">
-              {post.title}
-            </h1>
-            <div className="text-gray-700 text-lg whitespace-pre-wrap leading-relaxed">
-              {post.content}
-            </div>
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-6">{post.title}</h1>
+            <div className="text-gray-700 text-lg whitespace-pre-wrap">{post.content}</div>
+            
+            {/* THÊM DÒNG NÀY VÀO ĐÂY */}
+            <CommentSection postId={post._id.toString()} comments={post.comments} />
           </article>
         </div>
       </div>
