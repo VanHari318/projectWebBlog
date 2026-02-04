@@ -1,47 +1,46 @@
 import { NextResponse } from "next/server";
 import clientPromise from "@/lib/mongodb";
 
-// Hàm biến chữ có dấu thành slug không dấu
-function slugify(text: string) {
+function convertToSlug(text: string) {
   return text
-    .toString()
     .toLowerCase()
-    .normalize('NFD') // Chuẩn hóa Unicode để tách dấu
-    .replace(/[\u0300-\u036f]/g, '') // Xóa dấu
-    .replace(/\s+/g, '-') // Thay khoảng trắng bằng dấu gạch ngang
-    .replace(/[^\w-]+/g, '') // Xóa ký tự đặc biệt
-    .replace(/--+/g, '-') // Xóa gạch ngang thừa
-    .replace(/^-+/, '') // Xóa gạch ngang ở đầu
-    .replace(/-+$/, ''); // Xóa gạch ngang ở cuối
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[đĐ]/g, 'd')
+    .replace(/([^0-9a-z-\s])/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '');
 }
 
-// Hàm lấy dữ liệu (Mới thêm)
 export async function GET() {
   try {
     const client = await clientPromise;
     const db = client.db("myBlog");
+    // Lấy thêm cả trường slug để bên ngoài Link có dữ liệu mà dùng
     const posts = await db.collection("posts").find({}).sort({ _id: -1 }).toArray();
     return NextResponse.json(posts);
   } catch (e) {
     return NextResponse.json({ error: "Lỗi lấy dữ liệu" }, { status: 500 });
   }
 }
+
 export async function POST(request: Request) {
   try {
     const { title, content } = await request.json();
     const client = await clientPromise;
     const db = client.db("myBlog");
 
-    const slug = slugify(title); // Tạo slug từ tiêu đề
+    const slug = convertToSlug(title);
 
-    const result = await db.collection("posts").insertOne({
+    await db.collection("posts").insertOne({
       title,
       content,
-      slug, // Lưu slug vào database
+      slug: slug, 
       createdAt: new Date(),
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, slug });
   } catch (e) {
     return NextResponse.json({ success: false }, { status: 500 });
   }
