@@ -1,5 +1,6 @@
 import clientPromise from "@/lib/mongodb";
 
+export const revalidate = 0;
 export default async function Home() {
   try {
     const client = await clientPromise;
