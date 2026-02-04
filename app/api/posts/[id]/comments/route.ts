@@ -8,18 +8,9 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const client = await clientPromise;
     const db = client.db("myBlog");
 
-    // Thêm bình luận vào mảng comments của bài viết
     await db.collection("posts").updateOne(
       { _id: new ObjectId(params.id) },
-      { 
-        $push: { 
-          comments: {
-            author,
-            text,
-            createdAt: new Date()
-          } 
-        } as any
-      }
+      { $push: { comments: { author, text, createdAt: new Date() } } } as any
     );
 
     return NextResponse.json({ success: true });
