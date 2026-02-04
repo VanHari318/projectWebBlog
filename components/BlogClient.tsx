@@ -21,7 +21,7 @@ export default function BlogClient({ initialData }: { initialData: any }) {
       <div className="grid gap-4 mt-6">
         {posts?.map((post: any) => (
             // Nếu có slug thì dùng slug, không thì dùng tạm _id
-            <Link key={post._id} href={`/post/${post.slug || post._id}`}>
+            <Link key={post.slug} href={`/post/${post.slug || post._id}`}>
                 <div className="p-4 border rounded hover:shadow-lg cursor-pointer transition-all">
                 <h2 className="text-xl font-bold text-blue-600">{post.title}</h2>
                 <p className="line-clamp-3">{post.content}</p>
