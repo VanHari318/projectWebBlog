@@ -6,8 +6,8 @@ import CommentSection from "@/components/CommentSection";
 // Dòng này rất quan trọng để tránh lỗi khi build trên Vercel
 export const dynamic = "force-dynamic";
 
-export default async function PostDetail({ params }: { params: { slug: string } }) {
-  const { slug } = params;
+export default async function PostDetail({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params;
 
   try {
     const client = await clientPromise;
