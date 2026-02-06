@@ -11,7 +11,7 @@ export async function POST(
     // BẮT BUỘC: Phải await params trước khi dùng id
     const { id } = await params; 
     
-    const { author, text } = await request.json();
+    const { author, text, image } = await request.json();
     const client = await clientPromise;
     const db = client.db("myBlog");
 
@@ -23,6 +23,7 @@ export async function POST(
           comments: {
             author,
             text,
+            image,
             createdAt: new Date()
           } 
         } as any

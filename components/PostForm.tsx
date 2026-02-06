@@ -1,26 +1,70 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
 export default function PostForm() {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
+  const [image, setImage] = useState<File | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const res = await fetch("/api/posts", {
-      method: "POST",
-      body: JSON.stringify({ title, content }),
-      headers: { "Content-Type": "application/json" },
-    });
-
-    if (res.ok) {
-      setIsOpen(false);
-      setTitle(""); setContent("");
-      router.refresh(); // Làm mới dữ liệu trang chủ ngay lập tức
+  useEffect(() => {
+        return () => {
+          if (preview) {
+            URL.revokeObjectURL(preview);
+          }
+        }
+      }, [preview]);
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) =>{
+    const file = e.target.files?.[0];
+    if(file){
+      setImage(file);
+      setPreview(URL.createObjectURL(file));
     }
+  }
+
+  const handleUpload = async () =>{
+    try{
+      if(!image) return null;
+      const formData = new FormData();
+      formData.append("file", image);
+      formData.append("upload_preset", "myBlogUpload");
+      const res = await fetch("https://api.cloudinary.com/v1_1/dojcgjli4/image/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data =  await res.json();
+      return data.secure_url;
+    }
+    catch(err){
+      console.log(err);
+    }
+  }
+  const handleSubmit = async (e: React.FormEvent) => {
+    try{
+      e.preventDefault();
+      setLoading(true);
+
+      const imageUrl = await handleUpload();
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        body: JSON.stringify({ title, content, image: imageUrl }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (res.ok) {
+        setIsOpen(false);
+        setTitle(""); setContent(""); setImage(null); setLoading(false);
+        router.refresh(); // Làm mới dữ liệu trang chủ ngay lập tức
+      }
+    }
+    catch(err){
+      console.log(err);
+    }
+    
   };
 
   return (
@@ -51,8 +95,19 @@ export default function PostForm() {
                 onChange={(e) => setContent(e.target.value)}
                 required
               />
+              <div>
+                <label className="block text-sm font-medium text-gray-700">Thêm ảnh bài viết:</label>
+                <input type="file" onChange={(e) => handleFileChange(e)}/>
+              </div>
+              {preview && (
+                <div className="mt-2">
+                  <img src={preview} alt="Preview" className="w-full h-48 object-cover rounded" />
+                </div>
+              )}
               <div className="flex gap-2">
-                <button type="submit" className="flex-1 bg-blue-600 text-white p-2 rounded">Đăng</button>
+                <button type="submit" className="flex-1 bg-blue-600 text-white p-2 rounded" disabled={loading}>
+                  {loading ? "Đang đăng..." : "Đăng"}
+                </button>
                 <button 
                   type="button" 
                   onClick={() => setIsOpen(false)}

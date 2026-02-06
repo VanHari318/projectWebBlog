@@ -32,6 +32,11 @@ export default async function PostDetail({ params }: { params: Promise<{ slug: s
           <article className="bg-white rounded-2xl shadow-sm p-8 border border-gray-100 text-black">
             <h1 className="text-4xl font-bold mb-6">{post.title}</h1>
             <div className="text-lg whitespace-pre-wrap mb-10">{post.content}</div>
+            {post.image && (
+              <div>
+                <img src={post.image} alt={post.title} className="mb-6 w-full max-h-96 object-cover rounded" />
+              </div>
+            )}
 
             {/* Đảm bảo truyền mảng rỗng nếu chưa có bình luận */}
             <CommentSection 

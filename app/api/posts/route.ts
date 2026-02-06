@@ -27,7 +27,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const { title, content } = await request.json();
+    const { title, content, image } = await request.json();
     const client = await clientPromise;
     const db = client.db("myBlog");
 
@@ -37,6 +37,7 @@ export async function POST(request: Request) {
       title,
       content,
       slug: slug, 
+      image,
       createdAt: new Date(),
     });
 
