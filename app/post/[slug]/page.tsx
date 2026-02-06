@@ -34,7 +34,7 @@ export default async function PostDetail({ params }: { params: Promise<{ slug: s
             <div className="text-lg whitespace-pre-wrap mb-10">{post.content}</div>
             {post.image && (
               <div>
-                <img src={post.image} alt={post.title} className="mb-6 w-full max-h-96 object-cover rounded" />
+                <img src={post.image} alt={post.title} className="mb-6 w-full h-auto object-cover rounded" />
               </div>
             )}
 
