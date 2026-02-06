@@ -24,6 +24,10 @@ export default async function PostDetail({ params }: { params: Promise<{ slug: s
     if (!post) {
       return <div className="p-10 text-center">Bài viết không tồn tại.</div>;
     }
+    const getOptimizedImage = (url: string) => {
+      if (!url || !url.includes("cloudinary.com")) return url;
+      return url.replace("/upload/", "/upload/f_auto,q_auto/");
+    };
 
     return (
       <div className="min-h-screen bg-gray-50 py-10 px-4">
@@ -34,7 +38,7 @@ export default async function PostDetail({ params }: { params: Promise<{ slug: s
             <div className="text-lg whitespace-pre-wrap mb-10">{post.content}</div>
             {post.image && (
               <div>
-                <img src={post.image} alt={post.title} className="mb-6 w-full h-auto object-cover rounded" />
+                <img src={getOptimizedImage(post.image)} alt={post.title} className="mb-6 w-full h-auto object-cover rounded" />
               </div>
             )}
 
