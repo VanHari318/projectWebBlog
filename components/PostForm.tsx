@@ -78,7 +78,7 @@ export default function PostForm() {
 
       {isOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl">
+          <div className="bg-white p-6 rounded-xl w-full max-w-md shadow-2xl max-h-[90vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300">
             <h2 className="text-xl font-bold mb-4 text-black">Tạo bài viết mới</h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <input
@@ -101,7 +101,7 @@ export default function PostForm() {
               </div>
               {preview && (
                 <div className="mt-2">
-                  <img src={preview} alt="Preview" className="w-full h-48 object-cover rounded" />
+                  <img src={preview} alt="Preview" className="ww-full h-auto object-cover rounded" />
                 </div>
               )}
               <div className="flex gap-2">
