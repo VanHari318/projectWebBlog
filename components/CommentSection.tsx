@@ -32,7 +32,7 @@ export default function CommentSection({ postId, comments = [] }: { postId: stri
       const formData = new FormData();
       formData.append("file", image);
       formData.append("upload_preset", "myBlogUpload");
-      const res = await fetch("https://api.cloudinary.com/v1_1/dojcgjli4/image/upload", {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${process.env.MY_CLOUD_NAME}/image/upload`, {
         method: "POST",
         body: formData,
       });
