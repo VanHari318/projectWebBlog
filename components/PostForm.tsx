@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function PostForm() {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,8 +10,8 @@ export default function PostForm() {
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const { data: session, status } = useSession();
   const router = useRouter();
-
   useEffect(() => {
         return () => {
           if (preview) {
@@ -18,6 +19,25 @@ export default function PostForm() {
           }
         }
       }, [preview]);
+
+  //Status == loading
+  if (status === "loading") return <p>Đang tải...</p>;
+  
+  //Status == unauthenticated
+  if (status === "unauthenticated"){
+    return(
+      <div className="text-center p-10">
+        <h2 className="text-xl font-bold text-red-600">Bạn cần đăng nhập để đăng bài!</h2>
+        <button 
+          onClick={() => router.push("/login")}
+          className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Đi tới trang Đăng nhập
+        </button>
+      </div>
+    );
+  }
+  //Status == authenticated
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) =>{
     const file = e.target.files?.[0];
     if(file){

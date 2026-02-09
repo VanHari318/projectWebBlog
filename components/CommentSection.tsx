@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 export default function CommentSection({ postId, comments = [] }: { postId: string, comments: any[] }) {
   const [author, setAuthor] = useState("");
@@ -8,6 +9,7 @@ export default function CommentSection({ postId, comments = [] }: { postId: stri
   const [image, setImage] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const { data: session, status } = useSession();
   const router = useRouter();
 
   useEffect(() => {
@@ -66,7 +68,8 @@ export default function CommentSection({ postId, comments = [] }: { postId: stri
       <h3 className="text-2xl font-bold mb-6 text-black">Bình luận ({comments.length})</h3>
       
       {/* Form nhập bình luận */}
-      <form onSubmit={handleSubmit} className="mb-8 space-y-4">
+      {status === "authenticated" ? (
+        <form onSubmit={handleSubmit} className="mb-8 space-y-4">
         <input 
           className="w-full p-2 border rounded text-black" 
           placeholder="Tên của bạn..." 
@@ -85,6 +88,9 @@ export default function CommentSection({ postId, comments = [] }: { postId: stri
           Gửi bình luận
         </button>
       </form>
+      ):(
+        <p className="text-gray-500">Vui lòng đăng nhập để bình luận.</p>
+      )}
 
       {/* Danh sách bình luận */}
       <div className="space-y-4">
