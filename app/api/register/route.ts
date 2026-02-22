@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     // 1. Kết nối DB
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db("myBlog");
 
     // 2. Kiểm tra xem email đã tồn tại chưa
     const existingUser = await db.collection("users").findOne({ email });

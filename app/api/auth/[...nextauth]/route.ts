@@ -20,7 +20,7 @@ const handler = NextAuth({
       },
       async authorize(credentials) {
         const client = await clientPromise;
-        const user = await client.db().collection("users").findOne({ email: credentials?.email });
+        const user = await client.db("myBlog").collection("users").findOne({ email: credentials?.email });
 
         if (user && bcrypt.compareSync(credentials!.password, user.password)) {
           return { id: user._id.toString(), name: user.name, email: user.email };

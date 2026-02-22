@@ -6,7 +6,7 @@ import Link from "next/link";
 const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export default function BlogClient({ initialData }: { initialData: any }) {
-  // SWR sẽ dùng initialData để hiện ngay lập tức, sau đó 5s sẽ check bài mới
+  // SWR 
   const { data: posts } = useSWR("/api/posts", fetcher, {
     fallbackData: initialData,
     refreshInterval: 5000,
@@ -20,11 +20,11 @@ export default function BlogClient({ initialData }: { initialData: any }) {
 
       <div className="grid gap-4 mt-6">
         {posts?.map((post: any) => (
-            // Nếu có slug thì dùng slug, không thì dùng tạm _id
             <Link key={post._id} href={`/post/${post.slug || post._id}`}>
                 <div className="p-4 border rounded hover:shadow-lg cursor-pointer transition-all">
                 <h2 className="text-xl font-bold text-blue-600">{post.title}</h2>
                 <p className="line-clamp-3">{post.content}</p>
+                <img src={post.image} alt={post.title} className="mt-2 max-h-48 w-full object-cover rounded" />
                 </div>
             </Link>
         ))}
